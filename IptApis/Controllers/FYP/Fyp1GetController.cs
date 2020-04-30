@@ -41,7 +41,50 @@ namespace IptApis.Controllers.FYP
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
+        public HttpResponseMessage GetProposalDetails()
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+
+            response = db.Query("FypProposal").Select("ProjectTitle", "ProjectType", "Abstract", "SupervisorID", "CoSupervisorID", "LeaderID", "Member1ID", "Member2ID")
+               .Where("LeaderID", 163942).OrWhere("Member1ID", 163942).OrWhere("Member2ID", 163942)
+               .Get()
+               .Cast<IDictionary<string, object>>();
+
+         
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
+        public HttpResponseMessage GetProposalsNameSupervisor()
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+
+            response = db.Query("FypProposal").Select("ProjectTitle", "ProjectType", "Abstract", "SupervisorID", "CoSupervisorID", "LeaderID", "Member1ID", "Member2ID")
+               .Where("SupervisorID", 123).OrWhere("CoSupervisorID", 123)
+               .Get()
+               .Cast<IDictionary<string, object>>();
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
         //General
+
+        public HttpResponseMessage GetMaxStudents()
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("FypConfig").Select("MaxStudent", "MinStudent").Get().Cast<IDictionary<string, object>>();
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
 
         public HttpResponseMessage GetFypNames()
         {

@@ -41,24 +41,21 @@ namespace IptApis.Controllers.FYP
             test.TryGetValue("CoSupervisorID", out CoSupervisorID);
             int _CoSupervisorID = Convert.ToInt32(CoSupervisorID);
 
+            object LeaderID;
+            test.TryGetValue("LeaderID", out LeaderID);
+            int _LeaderID = Convert.ToInt32(LeaderID);
+
+            object Member1ID;
+            test.TryGetValue("Member1ID", out Member1ID);
+            int _Member1ID = Convert.ToInt32(Member1ID);
+
+            object Member2ID;
+            test.TryGetValue("Member2ID", out Member2ID);
+            int _Member2ID = Convert.ToInt32(Member2ID);
+
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
             
-            IEnumerable<IDictionary<string, object>> response;
-            response = db.Query("FypConfig").Select("MaxStudent").Get().Cast<IDictionary<string, object>>();
-            
-            var strResponse = response.ElementAt(0).ToString().Replace("DapperRow,", "").Replace("=", "").Replace("MaxStudent", "").Replace("{", "").Replace("}", "").Replace("'", "");
-            var result = Convert.ToInt32(strResponse);
-
-
-            object[] array = new object[result];
-            int[] ID = new int[result];
-
-            for(int i=0;i<array.Length;i++)
-            {
-                test.TryGetValue("Student"+i+"ID", out array[i]);
-                ID[i] = Convert.ToInt32(array[i]);
-            }
            
             using (TransactionScope scope = new TransactionScope())
             {
@@ -72,19 +69,14 @@ namespace IptApis.Controllers.FYP
                         Abstract = _Abstract,
                         SupervisorID = _SupervisorID,
                         CoSupervisorID = _CoSupervisorID,
+                        LeaderID = _LeaderID,
+                        Member1ID = _Member1ID,
+                        Member2ID = _Member2ID,
                         Comment = "",
                         Status = "Pending"
                     });   
 
-                    for (int i = 0; i < ID.Length; i++)
-                    {
-                        db.Query("FypStudentProposals").Insert(new
-                        {
-                            ProposalID = res,
-                            StudentID = ID[i],
-
-                        });
-                    }
+                   
 
                 
                     scope.Complete();  
