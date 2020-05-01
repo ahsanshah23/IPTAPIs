@@ -15,7 +15,7 @@ namespace IptApis.Controllers.FYP
 {
     public class Fyp1PostController : ApiController
     {
-        [HttpPost]
+        
         public HttpResponseMessage AddProposalStudent(Object Proposal)
         {
 
@@ -62,7 +62,7 @@ namespace IptApis.Controllers.FYP
                 try
                 {
 
-                    var res = db.Query("FypProposal").InsertGetId<int>(new
+                    var res = db.Query("FypProposal").Insert(new
                     {
                         ProjectTitle = _ProjectTitle,
                         ProjectType = _ProjectType,

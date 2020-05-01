@@ -41,6 +41,7 @@ namespace IptApis.Controllers.FYP
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
+        [HttpGet]
         public HttpResponseMessage GetProposalDetails()
         {
             var db = DbUtils.GetDBConnection();
