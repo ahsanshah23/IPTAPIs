@@ -393,37 +393,32 @@ namespace IptApis.Controllers.FYP
             test.TryGetValue("Fyp2Deliverables", out Fyp2Deliverables);
             string _Fyp2Deliverables = Convert.ToString(Fyp2Deliverables);
 
-            object Deliverables2;
-            test.TryGetValue("Deliverables2", out Deliverables2);
-            string _Deliverables2 = Convert.ToString(Deliverables2);
+            object LeaderID;
+            test.TryGetValue("LeaderID", out LeaderID);
+            int _LeaderID = Convert.ToInt32(LeaderID);
+
+            object Member1ID;
+            test.TryGetValue("Member1ID", out Member1ID);
+            int _Member1ID = Convert.ToInt32(Member1ID);
+
+            object Member2ID;
+            test.TryGetValue("Member2ID", out Member2ID);
+            int _Member2ID = Convert.ToInt32(Member2ID);
+
+            object leaderMarks;
+            test.TryGetValue("leaderMarks", out leaderMarks);
+            double _leaderMarks = Convert.ToDouble(leaderMarks);
+
+            object member1marks;
+            test.TryGetValue("member1marks", out member1marks);
+            double _member1marks = Convert.ToDouble(member1marks);
+
+            object member2marks;
+            test.TryGetValue("member2marks", out member2marks);
+            double _member2marks = Convert.ToDouble(member2marks);
 
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
-
-            IEnumerable<IDictionary<string, object>> response;
-            response = db.Query("FypConfig").Select("MaxStudent").Get().Cast<IDictionary<string, object>>();
-
-            var strResponse = response.ElementAt(0).ToString().Replace("DapperRow,", "").Replace("=", "").Replace("MaxStudent", "").Replace("{", "").Replace("}", "").Replace("'", "");
-            var result = Convert.ToInt32(strResponse);
-
-
-            object[] array = new object[result];
-            double[] Marks = new double[result];
-
-            for (int i = 0; i < array.Length; i++)
-            {
-                test.TryGetValue("Marks" + i, out array[i]);
-                Marks[i] = Convert.ToInt32(array[i]);
-            }
-
-            object[] array1 = new object[result];
-            int[] ID = new int[result];
-
-            for (int i = 0; i < array1.Length; i++)
-            {
-                test.TryGetValue("Student" + i + "ID", out array[i]);
-                ID[i] = Convert.ToInt32(array[i]);
-            }
 
             using (TransactionScope scope = new TransactionScope())
             {
@@ -443,16 +438,26 @@ namespace IptApis.Controllers.FYP
 
                     });
 
-                    for (int i = 0; i < Marks.Length; i++)
+                    db.Query("FypMarks").Insert(new
                     {
-                        db.Query("FypMarks").Insert(new
-                        {
-                            Marks = Marks[i],
-                            FormID = _FormID,
-                            StudentID = ID[i]
+                        StudentID = _LeaderID,
+                        FormID = 2,
+                        Marks = _leaderMarks
+                    });
 
-                        });
-                    }
+                    db.Query("FypMarks").Insert(new
+                    {
+                        StudentID = _Member1ID,
+                        FormID = 2,
+                        Marks = _member1marks
+                    });
+
+                    db.Query("FypMarks").Insert(new
+                    {
+                        StudentID = _Member2ID,
+                        FormID = 2,
+                        Marks = _member2marks
+                    });
 
 
                     scope.Complete();

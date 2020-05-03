@@ -44,10 +44,6 @@ namespace IptApis.Controllers.FYP
         [HttpGet]
         public HttpResponseMessage GetProposalDetails([FromUri] int id)
         {
-            //var data = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(Convert.ToString(ID));
-
-            //object StudentID;
-            //data.TryGetValue("ID", out StudentID);
             string _StudentID = Convert.ToString(id);
 
 
@@ -119,32 +115,70 @@ namespace IptApis.Controllers.FYP
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
+        public HttpResponseMessage GetFypDeliverablesDetailsByTitle([FromUri] string title)
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("Fyp").Select("FypID").Where("ProjectName", title).Get().Cast<IDictionary<string, object>>();
+
+            var strResponse = response.ElementAt(0).ToString().Replace("DapperRow,", "").Replace("=", "").Replace("FypID", "").Replace("'", "").Replace("}", "").Replace("{", "");
+            var result = Convert.ToInt32(strResponse);
+
+            IEnumerable<IDictionary<string, object>> response1;
+            response1 = db.Query("FypEvaluation").Select("Deliverables1", "Deliverables2", "Deliverables3", "Deliverables4", "Deliverables5").Where(new
+            {
+                FypID = result,
+                FormID = 1
+            }).Get().Cast<IDictionary<string, object>>();
+
+            return Request.CreateResponse(HttpStatusCode.OK, response1);
+        }
+
 
         //ProposalEvaluation
 
-        public HttpResponseMessage GetProposalEvaluations()
+        public HttpResponseMessage GetProposalEvaluations([FromUri] int id)
         {
-            var db = DbUtils.GetDBConnection();   
+            var db = DbUtils.GetDBConnection();
             db.Connection.Open();
-           
+
             IEnumerable<IDictionary<string, object>> response;
-            response = db.Query("FypEvaluation").Where("FormID",1).Get().Cast<IDictionary<string, object>>();   
-            
-            return Request.CreateResponse(HttpStatusCode.OK, response); 
+            response = db.Query("Fyp").Select("Fyp.ProjectName", "FypMembers.LeaderID", "FypMembers.Member1ID", "FypMembers.Member2ID"
+                , "Fyp.SuperVisorEmpID", "Fyp.CoSuperVisorID", "FypEvaluation.DefenceStatus", "FypEvaluation.Criteria1Marks", "FypEvaluation.Criteria2Marks",
+                "FypEvaluation.Criteria3Marks", "FypEvaluation.Criteria4Marks", "FypEvaluation.Criteria5Marks", "FypEvaluation.Deliverables1",
+                "FypEvaluation.Deliverables2", "FypEvaluation.Deliverables3", "FypEvaluation.Deliverables4", "FypEvaluation.Deliverables5",
+                "FypEvaluation.ChangesRecommeneded").Where("FypEvaluation.FormID", 1).Where("FypMembers.LeaderID", id).OrWhere("FypEvaluation.FormID", 1)
+                .Where("FypMembers.Member1ID", id).OrWhere("FypEvaluation.FormID", 1).Where("FypMembers.Member2ID", id)
+                .Join("FypEvaluation", "Fyp.FypID", "FypEvaluation.FypID")
+                .Join("FypMembers", "Fyp.FypID", "FypMembers.FypID")
+                .Get().Cast<IDictionary<string, object>>();
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
 
         //FinalEvaluation
 
-        public HttpResponseMessage GetFinalEvaluations()
+        public HttpResponseMessage GetFinalEvaluations([FromUri] int id)
         {
-            var db = DbUtils.GetDBConnection(); 
+            var db = DbUtils.GetDBConnection();
             db.Connection.Open();
-          
+
             IEnumerable<IDictionary<string, object>> response;
-            response = db.Query("FypEvaluation").Where("FormID", 2).Get().Cast<IDictionary<string, object>>();  
-            
-            return Request.CreateResponse(HttpStatusCode.OK, response);   
+            response = db.Query("Fyp").Select("Fyp.ProjectName", "FypMembers.LeaderID", "FypMembers.Member1ID", "FypMembers.Member2ID",
+                "Fyp.SuperVisorEmpID", "Fyp.CoSuperVisorID", "FypEvaluation.Deliverables1", "FypEvaluation.Deliverables2",
+                "FypEvaluation.Deliverables3", "FypEvaluation.Deliverables4", "FypEvaluation.Deliverables5", "FypEvaluation.Deliverable1Completion",
+                "FypEvaluation.Deliverable2Completion", "FypEvaluation.Deliverable3Completion", "FypEvaluation.Deliverable4Completion",
+                "FypEvaluation.Deliverable5Completion", "Fyp2Deliverables")
+                .Where("FypEvaluation.FormID", 2).Where("FypMembers.LeaderID", id).OrWhere("FypEvaluation.FormID", 2)
+                .Where("FypMembers.Member1ID", id).OrWhere("FypEvaluation.FormID", 2).Where("FypMembers.Member2ID", id)
+                .Join("FypEvaluation", "Fyp.FypID", "FypEvaluation.FypID")
+                .Join("FypMembers", "Fyp.FypID", "FypMembers.FypID")
+                .Get().Cast<IDictionary<string, object>>();
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
         }
     }
 }
