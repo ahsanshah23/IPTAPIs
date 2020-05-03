@@ -46,5 +46,16 @@ namespace IptApis.Controllers.FYP
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
+        public HttpResponseMessage GetFypNamesExternalJury([FromUri] string username)
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("Fyp").Select("Fyp.ProjectName", "Fyp.FypID").Where("FypExternalJuryAllocation.Username", username).Join("FypExternalJuryAllocation", "Fyp.FypID", "FypExternalJuryAllocation.FypID").Get().Cast<IDictionary<string, object>>();
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
     }
 }

@@ -42,15 +42,23 @@ namespace IptApis.Controllers.FYP
         }
 
         [HttpGet]
-        public HttpResponseMessage GetProposalDetails()
+        public HttpResponseMessage GetProposalDetails([FromUri] int id)
         {
+            //var data = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(Convert.ToString(ID));
+
+            //object StudentID;
+            //data.TryGetValue("ID", out StudentID);
+            string _StudentID = Convert.ToString(id);
+
+
+
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
 
             IEnumerable<IDictionary<string, object>> response;
 
-            response = db.Query("FypProposal").Select("ProjectTitle", "ProjectType", "Abstract", "SupervisorID", "CoSupervisorID", "LeaderID", "Member1ID", "Member2ID")
-               .Where("LeaderID", 163942).OrWhere("Member1ID", 163942).OrWhere("Member2ID", 163942)
+            response = db.Query("FypProposal").Select("ProposalID","ProjectTitle", "ProjectType", "Abstract", "SupervisorID", "CoSupervisorID", "LeaderID", "Member1ID", "Member2ID", "Comment", "Status")
+               .Where("LeaderID", _StudentID).OrWhere("Member1ID", _StudentID).OrWhere("Member2ID", _StudentID)
                .Get()
                .Cast<IDictionary<string, object>>();
 
@@ -65,7 +73,7 @@ namespace IptApis.Controllers.FYP
 
             IEnumerable<IDictionary<string, object>> response;
 
-            response = db.Query("FypProposal").Select("ProjectTitle", "ProjectType", "Abstract", "SupervisorID", "CoSupervisorID", "LeaderID", "Member1ID", "Member2ID")
+            response = db.Query("FypProposal").Select("ProposalID","ProjectTitle", "ProjectType", "Abstract", "SupervisorID", "CoSupervisorID", "LeaderID", "Member1ID", "Member2ID")
                .Where("SupervisorID", 123).OrWhere("CoSupervisorID", 123)
                .Get()
                .Cast<IDictionary<string, object>>();
@@ -87,25 +95,27 @@ namespace IptApis.Controllers.FYP
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
-        public HttpResponseMessage GetFypNames()
+        public HttpResponseMessage GetFypNames([FromUri] int id)
         {
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
 
             IEnumerable<IDictionary<string, object>> response;
-            response = db.Query("Fyp").Select("Fyp.ProjectName", "Fyp.FypID").Where("FypJury.EmpID", 6466).Join("FypJury", "Fyp.FypID", "FypJury.FypID").Get().Cast<IDictionary<string, object>>();
+            response = db.Query("Fyp").Select("Fyp.ProjectName", "Fyp.FypID").Where("FypJury.EmpID", id).Join("FypJury", "Fyp.FypID", "FypJury.FypID").Get().Cast<IDictionary<string, object>>();
 
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
-        public HttpResponseMessage GetFypDetailsByTitle()
+        
+
+        public HttpResponseMessage GetFypDetailsByTitle([FromUri] string title)
         {
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
 
             IEnumerable<IDictionary<string, object>> response;
-            response = db.Query("Fyp").Select("Fyp.CoSuperVisorID", "Fyp.SupervisorEmpID", "FypMembers.StudentID").Where("FypMembers.FypID", 1).Join("FypMembers", "Fyp.FypID", "FypMembers.FypID").Get().Cast<IDictionary<string, object>>();
-            
+            response = db.Query("Fyp").Select("Fyp.FypID", "Fyp.CoSuperVisorID", "Fyp.SupervisorEmpID", "FypMembers.LeaderID", "FypMembers.Member1ID", "FypMembers.Member2ID").Where("Fyp.ProjectName", title).Join("FypMembers", "Fyp.FypID", "FypMembers.FypID").Get().Cast<IDictionary<string, object>>();
+
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 

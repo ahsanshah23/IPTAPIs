@@ -15,14 +15,14 @@ namespace IptApis.Controllers.FYP
 {
     public class Fyp1PostController : ApiController
     {
-        
+
         public HttpResponseMessage AddProposalStudent(Object Proposal)
         {
 
             var test = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(Convert.ToString(Proposal));
-            
+
             object ProjectTitle;
-            test.TryGetValue("ProjectTitle", out ProjectTitle);   
+            test.TryGetValue("ProjectTitle", out ProjectTitle);
             string _ProjectTitle = Convert.ToString(ProjectTitle);
 
             object ProjectType;
@@ -55,8 +55,8 @@ namespace IptApis.Controllers.FYP
 
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
-            
-           
+
+
             using (TransactionScope scope = new TransactionScope())
             {
                 try
@@ -74,24 +74,24 @@ namespace IptApis.Controllers.FYP
                         Member2ID = _Member2ID,
                         Comment = "",
                         Status = "Pending"
-                    });   
+                    });
 
-                   
 
-                
-                    scope.Complete();  
+
+
+                    scope.Complete();
                     db.Connection.Close();
                     return Request.CreateResponse(HttpStatusCode.Created, new Dictionary<string, object>() { { "LastInsertedId", res } });
                 }
                 catch (Exception ex)
                 {
-                    scope.Dispose();   
+                    scope.Dispose();
                     return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ex);
                 }
 
             }
         }
-        
+
         [HttpPost]
         public HttpResponseMessage UpdateProposalSupervisor(Object Proposal)
         {
@@ -130,14 +130,17 @@ namespace IptApis.Controllers.FYP
             data.TryGetValue("ProposalID", out ProposalID);
             int _ProposalID = Convert.ToInt32(ProposalID);
 
-            object[] array = new object[3];
-            int[] ID = new int[3];
+            object LeaderID;
+            data.TryGetValue("LeaderID", out LeaderID);
+            int _LeaderID = Convert.ToInt32(LeaderID);
 
-            for (int i = 0; i < array.Length; i++)
-            {
-                data.TryGetValue("Student" + i + "ID", out array[i]);
-                ID[i] = Convert.ToInt32(array[i]);
-            }
+            object Member1ID;
+            data.TryGetValue("Member1ID", out Member1ID);
+            int _Member1ID = Convert.ToInt32(Member1ID);
+
+            object Member2ID;
+            data.TryGetValue("Member2ID", out Member2ID);
+            int _Member2ID = Convert.ToInt32(Member2ID);
 
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
@@ -146,7 +149,7 @@ namespace IptApis.Controllers.FYP
             {
                 try
                 {
-                    if(_Status == "Accepted")
+                    if (_Status == "Accepted")
                     {
 
                         db.Query("FypProposal").Where("ProposalID", _ProposalID).Update(new
@@ -164,14 +167,14 @@ namespace IptApis.Controllers.FYP
                             CoSuperVisorID = _CoSupervisorID,
                         });
 
-                        for (int i = 0; i < ID.Length; i++)
+                        db.Query("FypMembers").Insert(new
                         {
-                            db.Query("FypMembers").Insert(new
-                            {
-                                FypID = res,
-                                StudentID = ID[i],
-                            });
-                        }
+                            FypID = res,
+                            LeaderID = _LeaderID,
+                            Member1ID = _Member1ID,
+                            Member2ID = _Member2ID,
+                        });
+
 
                     }
                     else
@@ -258,14 +261,17 @@ namespace IptApis.Controllers.FYP
             test.TryGetValue("DefenceStatus", out DefenceStatus);
             string _DefenceStatus = Convert.ToString(DefenceStatus);
 
-            object[] array = new object[3];
-            int[] ID = new int[3];
+            object LeaderID;
+            test.TryGetValue("LeaderID", out LeaderID);
+            int _LeaderID = Convert.ToInt32(LeaderID);
 
-            for (int i = 0; i < array.Length; i++)
-            {
-                test.TryGetValue("Student" + i + "ID", out array[i]);
-                ID[i] = Convert.ToInt32(array[i]);
-            }
+            object Member1ID;
+            test.TryGetValue("Member1ID", out Member1ID);
+            int _Member1ID = Convert.ToInt32(Member1ID);
+
+            object Member2ID;
+            test.TryGetValue("Member2ID", out Member2ID);
+            int _Member2ID = Convert.ToInt32(Member2ID);
 
 
             var db = DbUtils.GetDBConnection();
@@ -301,14 +307,40 @@ namespace IptApis.Controllers.FYP
                         IEnumerable<IDictionary<string, object>> response;
                         response = db.Query("Fyp").Select("ProjectName").Where("FypID", _FypID).Get().Cast<IDictionary<string, object>>();
 
-                     
-                        var strResponse = response.ElementAt(0).ToString().Replace("DapperRow,", "").Replace("=", "").Replace("ProjectName","");
+
+                        var strResponse = response.ElementAt(0).ToString().Replace("DapperRow,", "").Replace("=", "").Replace("ProjectName", "");
                         var result = strResponse.ToString();
                         db.Query("FypProposal").Where("ProjectTitle", result).Update(new
                         {
                             Status = "Pending",
                         });
                     }
+                    else
+                    {
+                        var totalMarks = _Criteria1Marks + _Criteria2Marks + _Criteria3Marks + _Criteria4Marks + _Criteria5Marks;
+                        db.Query("FypMarks").Insert(new
+                        {
+                            StudentID = _LeaderID,
+                            FormID = 1,
+                            Marks = totalMarks
+                        });
+
+                        db.Query("FypMarks").Insert(new
+                        {
+                            StudentID = _Member1ID,
+                            FormID = 1,
+                            Marks = totalMarks
+                        });
+
+                        db.Query("FypMarks").Insert(new
+                        {
+                            StudentID = _Member2ID,
+                            FormID = 1,
+                            Marks = totalMarks
+                        });
+                    }
+
+
 
                     scope.Complete();
                     db.Connection.Close();
@@ -327,7 +359,7 @@ namespace IptApis.Controllers.FYP
         public HttpResponseMessage AddFinalEvaluationJury(Object FinalEvaluation)
         {
 
-             var test = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(Convert.ToString(FinalEvaluation));
+            var test = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(Convert.ToString(FinalEvaluation));
 
             object FypID;
             test.TryGetValue("FypID", out FypID);
@@ -380,7 +412,7 @@ namespace IptApis.Controllers.FYP
 
             for (int i = 0; i < array.Length; i++)
             {
-                test.TryGetValue("Marks"+i, out array[i]);
+                test.TryGetValue("Marks" + i, out array[i]);
                 Marks[i] = Convert.ToInt32(array[i]);
             }
 
@@ -408,7 +440,7 @@ namespace IptApis.Controllers.FYP
                         Deliverable4Completion = _Deliverable4Completion,
                         Deliverable5Completion = _Deliverable5Completion,
                         Fyp2Deliverables = _Fyp2Deliverables,
-                        
+
                     });
 
                     for (int i = 0; i < Marks.Length; i++)
@@ -435,6 +467,6 @@ namespace IptApis.Controllers.FYP
 
             }
         }
-        
+
     }
 }
