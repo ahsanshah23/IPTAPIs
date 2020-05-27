@@ -108,6 +108,7 @@
     <Compile Include="Controllers\FYP\Fyp1PostController.cs" />
     <Compile Include="Controllers\FYP\Fyp2GetController.cs" />
     <Compile Include="Controllers\FYP\Fyp2PostController.cs" />
+    <Compile Include="Controllers\FYP\LoginController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

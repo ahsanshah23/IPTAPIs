@@ -47,11 +47,27 @@ namespace IptApis.Controllers.FYP
 
             object Member1ID;
             test.TryGetValue("Member1ID", out Member1ID);
-            int _Member1ID = Convert.ToInt32(Member1ID);
+            double _Member1ID = 0;
+            if (Member1ID.Equals(""))
+            {
+                _Member1ID = 0;
+            }
+            else
+            {
+                _Member1ID = Convert.ToDouble(Member1ID);
+            }
 
             object Member2ID;
             test.TryGetValue("Member2ID", out Member2ID);
-            int _Member2ID = Convert.ToInt32(Member2ID);
+            double _Member2ID = 0;
+            if (Member2ID.Equals(""))
+            {
+                _Member2ID = 0;
+            }
+            else
+            {
+                _Member2ID = Convert.ToDouble(Member2ID);
+            }
 
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
@@ -136,11 +152,27 @@ namespace IptApis.Controllers.FYP
 
             object Member1ID;
             data.TryGetValue("Member1ID", out Member1ID);
-            int _Member1ID = Convert.ToInt32(Member1ID);
+            int _Member1ID = 0;
+            if (Member1ID.Equals(""))
+            {
+                _Member1ID = 0;
+            }
+            else
+            {
+                _Member1ID = Convert.ToInt32(Member1ID);
+            }
 
             object Member2ID;
             data.TryGetValue("Member2ID", out Member2ID);
-            int _Member2ID = Convert.ToInt32(Member2ID);
+            int _Member2ID = 0;
+            if (Member2ID.Equals(""))
+            {
+                _Member2ID = 0;
+            }
+            else
+            {
+                _Member2ID = Convert.ToInt32(Member2ID);
+            }
 
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
@@ -179,11 +211,7 @@ namespace IptApis.Controllers.FYP
                     }
                     else
                     {
-                        db.Query("FypProposal").Where("ProposalID", _ProposalID).Update(new
-                        {
-                            Status = _Status,
-                            Comment = _Comment
-                        });
+                        db.Query("FypProposal").Where("ProposalID", _ProposalID).Delete();
                     }
 
                     scope.Complete();
@@ -239,23 +267,63 @@ namespace IptApis.Controllers.FYP
 
             object Deliverables2;
             test.TryGetValue("Deliverables2", out Deliverables2);
-            string _Deliverables2 = Convert.ToString(Deliverables2);
+            string _Deliverables2 = "";
+            if (Deliverables2.Equals(""))
+            {
+                _Deliverables2 = "";
+            }
+            else
+            {
+                _Deliverables2 = Convert.ToString(Deliverables2);
+            }
 
             object Deliverables3;
             test.TryGetValue("Deliverables3", out Deliverables3);
-            string _Deliverables3 = Convert.ToString(Deliverables3);
+            string _Deliverables3 = "";
+            if (Deliverables3.Equals(""))
+            {
+                _Deliverables3 = "";
+            }
+            else
+            {
+                _Deliverables3 = Convert.ToString(Deliverables3);
+            }
 
             object Deliverables4;
             test.TryGetValue("Deliverables4", out Deliverables4);
-            string _Deliverables4 = Convert.ToString(Deliverables4);
+            string _Deliverables4 = "";
+            if (Deliverables4.Equals(""))
+            {
+                _Deliverables4 = "";
+            }
+            else
+            {
+                _Deliverables4 = Convert.ToString(Deliverables4);
+            }
 
             object Deliverables5;
-            test.TryGetValue("Deliverables1", out Deliverables5);
-            string _Deliverables5 = Convert.ToString(Deliverables5);
+            test.TryGetValue("Deliverables5", out Deliverables5);
+            string _Deliverables5 = "";
+            if (Deliverables5.Equals(""))
+            {
+                _Deliverables5 = "";
+            }
+            else
+            {
+                _Deliverables5 = Convert.ToString(Deliverables5);
+            }
 
             object ChangesRecommeneded;
             test.TryGetValue("ChangesRecommeneded", out ChangesRecommeneded);
-            string _ChangesRecommeneded = Convert.ToString(ChangesRecommeneded);
+            string _ChangesRecommeneded = "";
+            if (ChangesRecommeneded.Equals(""))
+            {
+                _ChangesRecommeneded = "";
+            }
+            else
+            {
+                _ChangesRecommeneded = Convert.ToString(ChangesRecommeneded);
+            }
 
             object DefenceStatus;
             test.TryGetValue("DefenceStatus", out DefenceStatus);
@@ -308,12 +376,12 @@ namespace IptApis.Controllers.FYP
                         response = db.Query("Fyp").Select("ProjectName").Where("FypID", _FypID).Get().Cast<IDictionary<string, object>>();
 
 
-                        var strResponse = response.ElementAt(0).ToString().Replace("DapperRow,", "").Replace("=", "").Replace("ProjectName", "");
+                        var strResponse = response.ElementAt(0).ToString().Replace("DapperRow,", "").Replace("=", "").Replace("ProjectName", "").Replace("{", "").Replace("}", "").Replace("'", "");
                         var result = strResponse.ToString();
-                        db.Query("FypProposal").Where("ProjectTitle", result).Update(new
-                        {
-                            Status = "Pending",
-                        });
+
+                        db.Query("FypProposal").Where("LeaderID", _LeaderID).Delete();
+                        db.Query("Fyp").Where("FypID", _FypID).Delete();
+                        db.Query("FypMembers").Where("FypID", _FypID).Delete();
                     }
                     else
                     {
@@ -375,19 +443,52 @@ namespace IptApis.Controllers.FYP
 
             object Deliverable2Completion;
             test.TryGetValue("Deliverable2Completion", out Deliverable2Completion);
-            double _Deliverable2Completion = Convert.ToDouble(Deliverable2Completion);
+
+            double _Deliverable2Completion = 0;
+            if (Deliverable2Completion.Equals(""))
+            {
+                _Deliverable2Completion = 0;
+            }
+            else
+            {
+                _Deliverable2Completion = Convert.ToDouble(Deliverable2Completion);
+            }
 
             object Deliverable3Completion;
             test.TryGetValue("Deliverable3Completion", out Deliverable3Completion);
-            double _Deliverable3Completion = Convert.ToDouble(Deliverable3Completion);
+            double _Deliverable3Completion = 0;
+            if (Deliverable3Completion.Equals(""))
+            {
+                _Deliverable3Completion = 0;
+            }
+            else
+            {
+                _Deliverable3Completion = Convert.ToDouble(Deliverable3Completion);
+            }
 
             object Deliverable4Completion;
             test.TryGetValue("Deliverable4Completion", out Deliverable4Completion);
-            double _Deliverable4Completion = Convert.ToDouble(Deliverable4Completion);
+            double _Deliverable4Completion = 0;
+            if (Deliverable4Completion.Equals(""))
+            {
+                _Deliverable4Completion = 0;
+            }
+            else
+            {
+                _Deliverable4Completion = Convert.ToDouble(Deliverable4Completion);
+            }
 
             object Deliverable5Completion;
             test.TryGetValue("Deliverable5Completion", out Deliverable5Completion);
-            double _Deliverable5Completion = Convert.ToDouble(Deliverable5Completion);
+            double _Deliverable5Completion = 0;
+            if (Deliverable5Completion.Equals(""))
+            {
+                _Deliverable5Completion = 0;
+            }
+            else
+            {
+                _Deliverable5Completion = Convert.ToDouble(Deliverable5Completion);
+            }
 
             object Fyp2Deliverables;
             test.TryGetValue("Fyp2Deliverables", out Fyp2Deliverables);
@@ -399,11 +500,27 @@ namespace IptApis.Controllers.FYP
 
             object Member1ID;
             test.TryGetValue("Member1ID", out Member1ID);
-            int _Member1ID = Convert.ToInt32(Member1ID);
+            double _Member1ID = 0;
+            if (Member1ID.Equals(""))
+            {
+                _Member1ID = 0;
+            }
+            else
+            {
+                _Member1ID = Convert.ToDouble(Member1ID);
+            }
 
             object Member2ID;
             test.TryGetValue("Member2ID", out Member2ID);
-            int _Member2ID = Convert.ToInt32(Member2ID);
+            double _Member2ID = 0;
+            if (Member2ID.Equals(""))
+            {
+                _Member2ID = 0;
+            }
+            else
+            {
+                _Member2ID = Convert.ToDouble(Member2ID);
+            }
 
             object leaderMarks;
             test.TryGetValue("leaderMarks", out leaderMarks);
@@ -411,11 +528,27 @@ namespace IptApis.Controllers.FYP
 
             object member1marks;
             test.TryGetValue("member1marks", out member1marks);
-            double _member1marks = Convert.ToDouble(member1marks);
+            double _member1marks = 0;
+            if (member1marks.Equals(""))
+            {
+                _member1marks = 0;
+            }
+            else
+            {
+                _member1marks = Convert.ToDouble(member1marks);
+            }
 
             object member2marks;
             test.TryGetValue("member2marks", out member2marks);
-            double _member2marks = Convert.ToDouble(member2marks);
+            double _member2marks = 0;
+            if (member2marks.Equals(""))
+            {
+                _member2marks = 0;
+            }
+            else
+            {
+                _member2marks = Convert.ToDouble(member2marks);
+            }
 
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();

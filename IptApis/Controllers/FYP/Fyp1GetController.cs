@@ -46,8 +46,7 @@ namespace IptApis.Controllers.FYP
         {
             string _StudentID = Convert.ToString(id);
 
-
-
+            
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
 
@@ -62,21 +61,52 @@ namespace IptApis.Controllers.FYP
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
-        public HttpResponseMessage GetProposalsNameSupervisor()
+        public HttpResponseMessage GetProposalsNameSupervisor([FromUri] int id)
         {
+            string _TeacherID = Convert.ToString(id);
+
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
 
             IEnumerable<IDictionary<string, object>> response;
 
             response = db.Query("FypProposal").Select("ProposalID","ProjectTitle", "ProjectType", "Abstract", "SupervisorID", "CoSupervisorID", "LeaderID", "Member1ID", "Member2ID")
-               .Where("SupervisorID", 123).OrWhere("CoSupervisorID", 123)
+               .Where("SupervisorID", _TeacherID).OrWhere("CoSupervisorID", _TeacherID)
                .Get()
                .Cast<IDictionary<string, object>>();
 
 
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
+
+        [HttpGet]
+        public HttpResponseMessage ProposalStatus([FromUri] int id)
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("FypProposal").Where("LeaderID", id).Where("Status", "Accepted").OrWhere("Status", "Rejected").AsCount()
+                .Get().Cast<IDictionary<string, object>>();
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
+        [HttpGet]
+        public HttpResponseMessage fyp1proposal_status([FromUri] int id)
+
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("FypProposal").Select("Status").Where("LeaderID", id).OrWhere("Member1ID", id).OrWhere("Member2ID", id)
+                .Get().Cast<IDictionary<string, object>>();
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
 
         //General
 
@@ -101,8 +131,6 @@ namespace IptApis.Controllers.FYP
 
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
-
-        
 
         public HttpResponseMessage GetFypDetailsByTitle([FromUri] string title)
         {
@@ -158,9 +186,23 @@ namespace IptApis.Controllers.FYP
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
+        [HttpGet]
+        public HttpResponseMessage DefenseStatus([FromUri] int id)
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("FypEvaluation").Where("FypID", id).Where("FormID", 1).AsCount()
+                .Get().Cast<IDictionary<string, object>>();
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
 
         //FinalEvaluation
-
+        [HttpGet]
         public HttpResponseMessage GetFinalEvaluations([FromUri] int id)
         {
             var db = DbUtils.GetDBConnection();
@@ -180,5 +222,20 @@ namespace IptApis.Controllers.FYP
 
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
+
+        [HttpGet]
+        public HttpResponseMessage Fyp1FinalStatus([FromUri] int id)
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("FypEvaluation").Where("FypID", id).Where("FormID", 2).AsCount()
+                .Get().Cast<IDictionary<string, object>>();
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
     }
 }

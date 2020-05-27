@@ -33,13 +33,15 @@ namespace IptApis.Controllers.FYP
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
-        public HttpResponseMessage GetFinalEvaluationByID()
+        public HttpResponseMessage GetFinalEvaluationByID([FromUri] int id)
         {
 
             var db = DbUtils.GetDBConnection();
             db.Connection.Open();
             IEnumerable<IDictionary<string, object>> response;
-            response = db.Query("FypEvaluation").Where("FormID", 4).Get().Cast<IDictionary<string, object>>();  
+            response = db.Query("FypEvaluation").Where("FormID", 4).Where("LeaderID", id).OrWhere("FormID", 4)
+                .Where("Member1ID", id).OrWhere("FormID", 4).Where("Member2ID", id)
+                .Get().Cast<IDictionary<string, object>>();  
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
 
@@ -63,6 +65,49 @@ namespace IptApis.Controllers.FYP
 
             return Request.CreateResponse(HttpStatusCode.OK, response);
         }
+
+        [HttpGet]
+        public HttpResponseMessage Fyp2MidStatus([FromUri] int id)
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("FypEvaluation").Where("FypID", id).Where("FormID", 3).AsCount()
+                .Get().Cast<IDictionary<string, object>>();
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
+        [HttpGet]
+        public HttpResponseMessage Fyp2FinalInternalStatus([FromUri] int id)
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("FypMarks").Where("StudentID", id).Where("FormID", 4).AsCount()
+                .Get().Cast<IDictionary<string, object>>();
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
+        [HttpGet]
+        public HttpResponseMessage Fyp2FinalExternalStatus([FromUri] int id)
+        {
+            var db = DbUtils.GetDBConnection();
+            db.Connection.Open();
+
+            IEnumerable<IDictionary<string, object>> response;
+            response = db.Query("FypMarks").Where("StudentID", id).Where("FormID", 5).AsCount()
+                .Get().Cast<IDictionary<string, object>>();
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, response);
+        }
+
 
     }
 }
