@@ -101,9 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\Cafeteria\CafeteriaController.cs" />
-    <Compile Include="Controllers\Cafeteria\CafeteriaStaffController.cs" />
-    <Compile Include="Controllers\Cafeteria\TestCafeteriaController.cs" />
     <Compile Include="Controllers\FYP\Fyp1GetController.cs" />
     <Compile Include="Controllers\FYP\Fyp1PostController.cs" />
     <Compile Include="Controllers\FYP\Fyp2GetController.cs" />
